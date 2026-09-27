@@ -22,7 +22,7 @@ import (
 	"github.com/vlno-ai/sdk/cli/internal/config"
 )
 
-const Version = "0.12.0"
+const Version = "0.12.1"
 const help = `vlno — remote world environments (preview)
 
 Usage:

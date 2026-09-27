@@ -1,0 +1,44 @@
+name: Publish SDK to PyPI
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing GitHub release version (without v)
+        required: true
+        type: string
+      sha256:
+        description: Reviewed SHA-256 of the release wheel
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: pypi-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'vlno-ai/sdk' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/vlno-sdk/
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download the reviewed release wheel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          EXPECTED_SHA256: ${{ inputs.sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$EXPECTED_SHA256" =~ ^[a-f0-9]{64}$ ]]
+          mkdir dist
+          wheel="vlno_sdk-${VERSION}-py3-none-any.whl"
+          gh release download "v${VERSION}" --repo vlno-ai/sdk --pattern "$wheel" --dir dist
+          printf '%s  %s\n' "$EXPECTED_SHA256" "dist/$wheel" | sha256sum --check --strict
+      - name: Publish with PyPI trusted identity
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1

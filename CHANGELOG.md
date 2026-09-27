@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.1 — 2026-09-27
+
+- Prepare the initial PyPI distribution and remove temporary publication-pending notices.
+- Add manually dispatched, checksum-verified trusted publishing from the VLNO repository.
+- SDK and CLI runtime behavior is unchanged from 0.12.0.
+
 ## 0.12.0 — 2026-09-27
 
 - VLNO distribution name (`vlno-sdk`) and `from vlno import Client` customer API.

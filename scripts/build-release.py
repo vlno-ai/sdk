@@ -9,7 +9,7 @@ import zipfile
 
 root=Path(__file__).resolve().parents[1]
 out=Path(sys.argv[1]).absolute();out.mkdir(parents=True,exist_ok=True)
-version='0.12.0'
+version='0.12.1'
 subprocess.run([sys.executable,'-c',"import setuptools.build_meta; setuptools.build_meta.build_wheel("+repr(str(out))+")"],cwd=root/'python',check=True)
 for target,arch in [('darwin','arm64'),('darwin','amd64'),('linux','amd64'),('linux','arm64'),('windows','amd64')]:
     import tempfile
@@ -22,7 +22,7 @@ for target,arch in [('darwin','arm64'),('darwin','amd64'),('linux','amd64'),('li
         else:
             with tarfile.open(out/(name+'.tar.gz'),'w:gz') as archive:archive.add(binary,arcname=binary.name)
 with tarfile.open(out/f'vlno-sdk-{version}-source.tar.gz','w:gz') as archive:
-    for prefix in ['README.md','CHANGELOG.md','NOTICE','AGENTS.md','.gitignore','.env.example','docs','examples','scripts','python','cli']:
+    for prefix in ['.github','README.md','CHANGELOG.md','NOTICE','AGENTS.md','.gitignore','.env.example','docs','examples','scripts','python','cli']:
         path=root/prefix
         files=[path] if path.is_file() else sorted(path.rglob('*'))
         for file in files:

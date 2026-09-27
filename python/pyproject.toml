@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vlno-sdk"
-version = "0.12.0"
+version = "0.12.1"
 description = "VLNO SDK for hosted agent evaluations and live trajectories"
 readme = "README.md"
 authors = [{name = "VLNO"}]
@@ -17,4 +17,4 @@ where = ["src"]
 [project.urls]
 Homepage = "https://vlno.ai"
 Repository = "https://github.com/vlno-ai/sdk"
-Documentation = "https://github.com/vlno-ai/sdk/blob/v0.12.0/docs/tutorial.md"
+Documentation = "https://github.com/vlno-ai/sdk/blob/v0.12.1/docs/tutorial.md"

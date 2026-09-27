@@ -27,7 +27,7 @@ def save():
     os.replace(temporary,state_path)
 
 client=Client(os.environ.get('VLNO_ENDPOINT','https://api.vlno.ai'),os.environ['VLNO_API_KEY'])
-run=client.runs.create(args.suite,revision='scripted-sdk-smoke-v0.12.0',idempotency_key=state['request_key'],environment=args.environment)
+run=client.runs.create(args.suite,revision='scripted-sdk-smoke-v0.12.1',idempotency_key=state['request_key'],environment=args.environment)
 state['run_id']=run.id;save()
 print('Watch live: https://beta.vlno.ai/runs/'+run.id,flush=True)
 case=run.next(state['claim'],timeout=600)

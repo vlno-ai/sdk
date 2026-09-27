@@ -1,8 +1,4 @@
-# VLNO 0.12.0: hosted evaluations and live trajectories
-
-> Initial PyPI publication is pending publisher access. Until it is available,
-> install the wheel from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0)
-> with `python -m pip install ./vlno_sdk-0.12.0-py3-none-any.whl`.
+# VLNO 0.12.1: hosted evaluations and live trajectories
 
 This guide covers the runnable customer path. It supersedes earlier conceptual
 SDK examples: the released client is synchronous and uses organization-owned
@@ -14,19 +10,19 @@ unprovisioned organizations.
 
 Requirements: Python 3.11+ for the SDK, or the standalone CLI for your OS/CPU.
 Install the SDK from PyPI. CLI archives, a wheel for offline installation, source
-examples and `SHA256SUMS` are in the [0.12.0 release](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0).
+examples and `SHA256SUMS` are in the [0.12.1 release](https://github.com/vlno-ai/sdk/releases/tag/v0.12.1).
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install vlno-sdk==0.12.0
+python -m pip install vlno-sdk==0.12.1
 python -c 'import vlno; print(vlno.__version__)'
 ```
 
-For the CLI, extract the matching `vlno_0.12.0_OS_ARCH` archive and put `vlno`
+For the CLI, extract the matching `vlno_0.12.1_OS_ARCH` archive and put `vlno`
 (or `vlno.exe`) on PATH. Check the downloaded file's SHA-256 against SHA256SUMS.
 On macOS/Linux use `shasum -a 256 FILE` or `sha256sum FILE`; Windows PowerShell
-has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.12.0.
+has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.12.1.
 
 Python source installation is also supported from this client-only repository:
 `python -m pip install ./python`. Building the CLI needs Go 1.23+:

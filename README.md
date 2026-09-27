@@ -1,20 +1,16 @@
 # VLNO SDK and CLI
 
-> Initial PyPI publication is pending publisher access. Until it is available,
-> install the wheel from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0)
-> with `python -m pip install ./vlno_sdk-0.12.0-py3-none-any.whl`.
-
 Run your own agent against hosted evaluation environments and see its trajectory
 and results in [VLNO](https://beta.vlno.ai). Install a small client; environments,
 application state, grading and evidence storage run on VLNO infrastructure.
 
-Version **0.12.0**, preview. Python 3.11+ and standalone `vlno` CLI builds for
+Version **0.12.1**, preview. Python 3.11+ and standalone `vlno` CLI builds for
 macOS, Linux and Windows. No Docker or engine checkout is required by customers.
 
 ## Start here
 
-1. Install the Python SDK with `python -m pip install vlno-sdk==0.12.0`.
-   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0)
+1. Install the Python SDK with `python -m pip install vlno-sdk==0.12.1`.
+   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.1)
    and verify them against `SHA256SUMS` before installing.
 2. Obtain an organization-scoped VLNO API key and an enabled suite from your VLNO
    contact. Access to the hosted pilot is explicitly provisioned.

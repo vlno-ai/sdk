@@ -1,24 +1,20 @@
 # VLNO SDK and CLI
 
-> Initial PyPI publication is pending publisher access. Until it is available,
-> install the wheel from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0)
-> with `python -m pip install ./vlno_sdk-0.12.0-py3-none-any.whl`.
-
 Run your own agent against hosted evaluation environments and see its trajectory
 and results in [VLNO](https://beta.vlno.ai). Install a small client; environments,
 application state, grading and evidence storage run on VLNO infrastructure.
 
-Version **0.12.0**, preview. Python 3.11+ and standalone `vlno` CLI builds for
+Version **0.12.1**, preview. Python 3.11+ and standalone `vlno` CLI builds for
 macOS, Linux and Windows. No Docker or engine checkout is required by customers.
 
 ## Start here
 
-1. Install the Python SDK with `python -m pip install vlno-sdk==0.12.0`.
-   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.0)
+1. Install the Python SDK with `python -m pip install vlno-sdk==0.12.1`.
+   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.1)
    and verify them against `SHA256SUMS` before installing.
 2. Obtain an organization-scoped VLNO API key and an enabled suite from your VLNO
    contact. Access to the hosted pilot is explicitly provisioned.
-3. Follow [the complete tutorial](https://github.com/vlno-ai/sdk/blob/v0.12.0/docs/tutorial.md). The first example uses a
+3. Follow [the complete tutorial](https://github.com/vlno-ai/sdk/blob/v0.12.1/docs/tutorial.md). The first example uses a
    scripted Notes workflow, so it incurs no model calls.
 
 ```python
@@ -61,4 +57,4 @@ PYTHONPATH=python/src:python/tests python -m unittest discover -s python/tests
 The clients do not contain environments, graders, customer data or provider keys.
 This preview does not claim automatic access to an agent's un-emitted internal
 state. Configure its normal transcript output or emit events from your harness.
-See [recording coverage](https://github.com/vlno-ai/sdk/blob/v0.12.0/docs/trajectory.md).
+See [recording coverage](https://github.com/vlno-ai/sdk/blob/v0.12.1/docs/trajectory.md).

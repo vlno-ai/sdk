@@ -1,4 +1,4 @@
-# VLNO CLI 0.12.0
+# VLNO CLI 0.12.1
 
 A standalone customer client for hosted VLNO evaluations. See the repository
 [tutorial](../docs/tutorial.md) and [trajectory guide](../docs/trajectory.md).
