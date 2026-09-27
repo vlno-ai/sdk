@@ -30,10 +30,20 @@ Python source installation is also supported from this client-only repository:
 
 ## 2. Access and credentials
 
-Request an operator API key for your VLNO organization and the suite reference
-you are allowed to run. Use `https://api.vlno.ai` for the product API and sign in
-to `https://beta.vlno.ai` with the same organization. The first qualified pilot
-suite is `pilot-notes@1`; the contact must enable your organization before use.
+Sign in to [VLNO beta → API keys](https://beta.vlno.ai/api-keys) and select the
+workspace you will evaluate in. An owner or admin can choose **Create key**, give
+it a name, select **Operator — run evaluations**, and set a 7, 30 or 90 day expiry.
+Copy the full key immediately: it is shown once and cannot be retrieved after
+the dialog closes. Other members should ask a workspace owner or admin for a key.
+
+The page lists key prefixes, access, status, expiry and last use. **Revoke** stops
+API access for that key; create a replacement if needed. Read-only keys can view
+results but cannot start evaluations. The Harness page's session token is a
+separate credential and cannot replace the account API key.
+
+Use `https://api.vlno.ai` for the product API. Keys apply to their workspace;
+creating one does not enable additional suites. The first qualified pilot suite
+is `pilot-notes@1`; your VLNO contact must enable your organization before use.
 
 Set `VLNO_API_KEY` from your secret manager or a private local file; do not put
 it in source code, shell history, screenshots, messages or the model prompt.

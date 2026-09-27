@@ -12,8 +12,9 @@ macOS, Linux and Windows. No Docker or engine checkout is required by customers.
 1. Install the Python SDK with `python -m pip install vlno-sdk==0.12.1`.
    Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.12.1)
    and verify them against `SHA256SUMS` before installing.
-2. Obtain an organization-scoped VLNO API key and an enabled suite from your VLNO
-   contact. Access to the hosted pilot is explicitly provisioned.
+2. Create an operator key in [beta → API keys](https://beta.vlno.ai/api-keys)
+   as a workspace owner or admin, and copy it once. Your VLNO contact separately
+   enables the suites your workspace can run.
 3. Follow [the complete tutorial](docs/tutorial.md). The first example uses a
    scripted Notes workflow, so it incurs no model calls.
 
