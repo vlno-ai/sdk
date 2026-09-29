@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0 — 2026-09-29
+
+- Discover exactly versioned suites granted to the current workspace with `client.suites.list()` or `vlno platform suites list`.
+- Read and manage prospective data retention; inspect deletion progress and request explicit run-data deletion through `client.data` and `vlno platform data`.
+- Keep deletion acceptance separate from completion, validate component timestamps, and retain backup/external-copy limitations in client responses.
+- Document workspace access, full operator grants, app/MCP/shell integration boundaries and data lifecycle recovery.
+
 ## 0.12.1 — 2026-09-27
 
 - Prepare the initial PyPI distribution and remove temporary publication-pending notices.

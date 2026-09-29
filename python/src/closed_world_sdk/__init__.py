@@ -12,7 +12,7 @@ import uuid
 import secrets
 from typing import NamedTuple
 
-__version__ = '0.12.1'
+__version__ = '0.13.0'
 
 
 class SDKError(Exception):

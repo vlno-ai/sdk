@@ -55,6 +55,12 @@ func validProductRun(v map[string]any, id string) bool {
 }
 
 func (r *runner) platform(args []string) error {
+	if len(args) > 0 && args[0] == "data" {
+		return r.productData(args[1:])
+	}
+	if len(args) == 2 && args[0] == "suites" && args[1] == "list" {
+		return r.productSuites()
+	}
 	if len(args) > 0 && args[0] == "login" {
 		return r.saveLogin(args[1:], true)
 	}

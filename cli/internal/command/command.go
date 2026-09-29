@@ -22,12 +22,18 @@ import (
 	"github.com/vlno-ai/sdk/cli/internal/config"
 )
 
-const Version = "0.12.1"
+const Version = "0.13.0"
 const help = `vlno — remote world environments (preview)
 
 Usage:
   vlno login --key-stdin
   vlno platform login --key-stdin
+  vlno platform data policy
+  vlno platform data set-policy --days <7|30|90|keep> --revision <current-revision>
+  vlno platform data status <cw_run-id>
+  vlno platform data delete <cw_run-id> --confirm-run <same-cw_run-id>
+  vlno platform data deletions [--limit 50] [--offset 0]
+  vlno platform suites list
   vlno platform runs create <suite-ref> --revision <label> --idempotency-key <key> [--environment] [--ttl 1800]
   vlno platform runs status <cw_run-id>
   vlno platform runs next <cw_run-id> --claim-file <private-file> --out <new-private-file>

@@ -1,4 +1,4 @@
-# VLNO 0.12.1: hosted evaluations and live trajectories
+# VLNO 0.13.0: hosted evaluations and live trajectories
 
 This guide covers the runnable customer path. It supersedes earlier conceptual
 SDK examples: the released client is synchronous and uses organization-owned
@@ -10,19 +10,19 @@ unprovisioned organizations.
 
 Requirements: Python 3.11+ for the SDK, or the standalone CLI for your OS/CPU.
 Install the SDK from PyPI. CLI archives, a wheel for offline installation, source
-examples and `SHA256SUMS` are in the [0.12.1 release](https://github.com/vlno-ai/sdk/releases/tag/v0.12.1).
+examples and `SHA256SUMS` are in the [0.13.0 release](https://github.com/vlno-ai/sdk/releases/tag/v0.13.0).
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install vlno-sdk==0.12.1
+python -m pip install vlno-sdk==0.13.0
 python -c 'import vlno; print(vlno.__version__)'
 ```
 
-For the CLI, extract the matching `vlno_0.12.1_OS_ARCH` archive and put `vlno`
+For the CLI, extract the matching `vlno_0.13.0_OS_ARCH` archive and put `vlno`
 (or `vlno.exe`) on PATH. Check the downloaded file's SHA-256 against SHA256SUMS.
 On macOS/Linux use `shasum -a 256 FILE` or `sha256sum FILE`; Windows PowerShell
-has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.12.1.
+has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.13.0.
 
 Python source installation is also supported from this client-only repository:
 `python -m pip install ./python`. Building the CLI needs Go 1.23+:
@@ -42,8 +42,17 @@ results but cannot start evaluations. The Harness page's session token is a
 separate credential and cannot replace the account API key.
 
 Use `https://api.vlno.ai` for the product API. Keys apply to their workspace;
-creating one does not enable additional suites. The first qualified pilot suite
-is `pilot-notes@1`; your VLNO contact must enable your organization before use.
+creating one does not enable additional suites. Hosted access is provisioned per exact suite version and worker. Inspect
+[Hosted suites](https://beta.vlno.ai/hosted-suites), `client.suites.list()`, or:
+
+```sh
+vlno platform suites list --json
+```
+
+An empty list means no suites are assigned to this workspace. `pilot-notes@1`
+is the smoke test. `notes-integrity@1`, when assigned, checks targeted changes
+and preservation of unrelated Notes records during the workflow. See
+[suite scope and connection qualification](hosted-suites.md).
 
 Set `VLNO_API_KEY` from your secret manager or a private local file; do not put
 it in source code, shell history, screenshots, messages or the model prompt.
@@ -240,3 +249,75 @@ broad security capability or suitability of every agent.
 
 Never email credentials or private connection/recovery files. Share the run URL,
 client version, non-secret error code and relevant timestamp with VLNO instead.
+
+
+## 8. Retention and deletion
+
+Open [Evaluation data](https://beta.vlno.ai/data-controls) to see the workspace
+policy and each run's expiry. Owners and admins can choose 7, 30 or 90 days, or
+keep data until explicitly deleted. Saving applies only to newly created runs;
+existing runs retain their original policy. Retention begins when execution ends,
+not when the short agent lease expires. An unset policy keeps data indefinitely.
+
+To delete a run, open its data status, choose **Delete run data**, and enter the
+complete run ID. The run must be terminal with confirmed resource cleanup.
+Acceptance removes access immediately; worker files, all archived object versions,
+and database payloads are then deleted in retryable stages. Status remains
+**Deletion in progress** until every live-data stage completes. Minimal identifiers,
+idempotency hashes and audit records remain to prevent accidental recreation.
+Downloaded copies are your responsibility. The backup expiry estimate remains
+unknown until the entire backup policy has been verified; live-data deletion does
+not mean every backup has been erased.
+
+Read status with an ordinary operator key:
+
+```python
+policy = client.data.policy()
+status = client.data.status(run.id)
+requests = client.data.deletions(limit=50, offset=0)
+print(status["state"])  # retained, deleting, or live_data_deleted
+```
+
+```sh
+vlno platform data policy --json
+vlno platform data status "$RUN_ID" --json
+vlno platform data deletions --limit 50 --offset 0 --json
+```
+
+Policy changes and deletion require `org.manage`; the operator key issued by the
+beta onboarding flow deliberately lacks that permission. Prefer the authenticated
+owner/admin page for those actions. If your trusted administrative automation has
+an explicitly issued owner/admin API key, the equivalent calls are:
+
+```python
+policy = client.data.policy()
+client.data.set_policy(30, expected_revision=policy["revision"])
+client.data.delete(run.id, confirm_run_id=run.id)
+```
+
+```sh
+vlno platform data set-policy --days 30 --revision CURRENT_REVISION --json
+vlno platform data delete "$RUN_ID" --confirm-run "$RUN_ID" --json
+```
+
+Do not give an administrative key to an evaluated agent. A 409 on policy update
+means someone changed the policy; read it again before saving. After a deletion
+request times out, read data status before retrying the same confirmed request.
+Repeated requests are safe. Normal run/evidence/transcript reads return 410 once
+deletion is accepted; data status remains available. Reusing the old creation key
+will not recreate deleted workloads.
+
+## 9. Permissions and key replacement
+
+The run controller needs `suites.read`, `runs.create`, `runs.read`, and
+`runs.cancel`. The Operator role includes all four. Read-only access cannot run or
+cancel evaluations. API-key issuance/revocation and data-management mutations
+require `org.manage` (Owner/Admin). Suite assignment additionally requires VLNO
+staff authorization; workspace owners cannot grant themselves private suites.
+
+To replace a key, create a new named Operator key in **API keys**, update the
+controller's secret, verify suite discovery, then revoke the old key. Revocation
+stops account API access; existing scoped agent leases are separate. Cancel an
+active run to revoke its capability and clean up its world. Removing suite access
+blocks new runs and new task assignments, but does not retroactively stop a task
+already assigned. Use cancellation when that is required.

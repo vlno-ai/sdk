@@ -150,10 +150,10 @@ func (c *Client) MCP(ctx context.Context, path string, payload any, version stri
 }
 
 func (c *Client) request(ctx context.Context, method, path string, payload any, idempotencyKey string, mcp bool, version string) (map[string]any, error) {
-	if !routePattern.MatchString(path) && !(method == http.MethodGet && regexp.MustCompile(`^/v1/world-runs/cw_[a-f0-9]{32}/cases/(0|[1-9]|1[0-5])/transcript\?after=(0|[1-9][0-9]{0,15})$`).MatchString(path)) {
+	if !routePattern.MatchString(path) && !(method == http.MethodGet && regexp.MustCompile(`^/v1/world-data/deletions\?limit=([1-9][0-9]?|100)&offset=(0|[1-9][0-9]{0,6})$`).MatchString(path)) && !(method == http.MethodGet && regexp.MustCompile(`^/v1/world-runs/cw_[a-f0-9]{32}/cases/(0|[1-9]|1[0-5])/transcript\?after=(0|[1-9][0-9]{0,15})$`).MatchString(path)) {
 		return nil, &Error{Code: "invalid_route"}
 	}
-	if method != http.MethodGet && method != http.MethodPost && method != http.MethodDelete {
+	if method != http.MethodGet && method != http.MethodPost && method != http.MethodDelete && !(method == http.MethodPut && path == "/v1/world-data/policy") {
 		return nil, &Error{Code: "invalid_method"}
 	}
 	if idempotencyKey != "" && !keyPattern.MatchString(idempotencyKey) {

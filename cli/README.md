@@ -1,4 +1,4 @@
-# VLNO CLI 0.12.1
+# VLNO CLI 0.13.0
 
 A standalone customer client for hosted VLNO evaluations. See the repository
 [tutorial](../docs/tutorial.md) and [trajectory guide](../docs/trajectory.md).
@@ -18,3 +18,12 @@ non-platform world/catalog/authoring commands use a separate operator worker API
 A hosted customer key cannot administer the worker.
 
 Build: `go build -trimpath -o vlno ./cmd/vlno`. Test: `go test ./...`.
+
+## Hosted catalog and data
+
+`vlno platform suites list` shows the suites assigned to the authenticated workspace.
+`vlno platform data policy`, `status RUN_ID`, and `deletions` read retention and
+deletion progress. Administrative `set-policy --days 30 --revision N` applies only
+to new runs; `delete RUN_ID --confirm-run RUN_ID` explicitly requests irreversible
+payload deletion. These two mutations require `org.manage`, not an ordinary
+Operator key. See [the tutorial](../docs/tutorial.md) for backup and recovery limits.
