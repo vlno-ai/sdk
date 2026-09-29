@@ -253,6 +253,20 @@ client version, non-secret error code and relevant timestamp with VLNO instead.
 
 ## 8. Retention and deletion
 
+Hosted data remains on VLNO infrastructure: the product database stores run
+metadata, results and the combined transcript; the worker retains execution
+receipts, observations and task files; the evidence archive stores report,
+snapshot, evidence and trace objects. World cleanup ends execution and revokes
+the agent connection. It does not by itself erase these retained records.
+
+Reading run data requires `runs.read` in the owning workspace. Read-only,
+Operator and Owner/Admin roles can read it; another workspace and a scoped
+agent connection cannot. Authorized VLNO infrastructure administrators also
+operate the underlying storage. This is application-level tenant isolation,
+not a claim that VLNO operators cannot access stored data. Confirm deployment
+region and contractual data requirements with VLNO before submitting sensitive
+workloads; client installation does not select a region or residency policy.
+
 Open [Evaluation data](https://beta.vlno.ai/data-controls) to see the workspace
 policy and each run's expiry. Owners and admins can choose 7, 30 or 90 days, or
 keep data until explicitly deleted. Saving applies only to newly created runs;
