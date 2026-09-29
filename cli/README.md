@@ -1,4 +1,4 @@
-# VLNO CLI 0.13.0
+# VLNO CLI 0.14.0
 
 A standalone customer client for hosted VLNO evaluations. See the repository
 [tutorial](../docs/tutorial.md) and [trajectory guide](../docs/trajectory.md).
@@ -27,3 +27,15 @@ deletion progress. Administrative `set-policy --days 30 --revision N` applies on
 to new runs; `delete RUN_ID --confirm-run RUN_ID` explicitly requests irreversible
 payload deletion. These two mutations require `org.manage`, not an ordinary
 Operator key. See [the tutorial](../docs/tutorial.md) for backup and recovery limits.
+
+## Live runs
+
+`vlno platform runs watch RUN_ID --wait-timeout 900s --json` streams run status
+and recorded messages, tool calls, shell activity and results as JSON lines.
+`--after CURSOR` resumes trajectory after a previously received `nextCursor`.
+Within a command, interrupted connections reconnect automatically without repeating
+case claims or actions. `next` and `wait` also use SSE while waiting.
+
+`watch` observes; use `wait` for a pass/fail CI exit code. Streams replay recorded
+activity, not private harness activity that was never captured. See
+[trajectory documentation](../docs/trajectory.md).

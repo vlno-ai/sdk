@@ -89,3 +89,31 @@ shell_command, shell_output, stdout, stderr, lifecycle and gap. Reads require
 - The environment audit uses the worker trace, or its hash-verified archived
   artifact. Historic runs show only what was recorded then; missing chat and
   response bodies cannot be reconstructed.
+
+## SSE in CLI 0.14.0 and beta
+
+`vlno platform runs watch RUN_ID --wait-timeout 900s --json` follows the entire
+run. Events are `run` snapshots, `trajectory` pages, and `done`. Each trajectory
+entry has its case index, source, kind, receipt sequence and original event time.
+The CLI emits JSON lines with `event` and `data`; `data.nextCursor` is the replay
+position. Use `--after CURSOR` to resume a new watch command.
+
+The API is `GET /v1/world-runs/RUN_ID/events?after=CURSOR`, authenticated with
+an organization-scoped bearer and `runs.read`. `Last-Event-ID` is also accepted
+and takes precedence. Trajectory pages are ordered by database receipt sequence;
+run snapshots describe the latest status rather than an immutable lifecycle log.
+Frames are bounded to 4 MiB. The server checks persisted changes every second,
+sends heartbeats, and renews authentication at most every 45 seconds, sooner at
+JWT expiry. API-key revocation takes effect on the next connection, within that
+lease. Slow consumers receive backpressure and can resume from their last cursor.
+
+CLI and beta reconnect with the last completely consumed cursor. An interrupted
+frame is replayed; it is never treated as successful completion. Requests to claim
+cases, submit grades or execute tools are not replayed by the stream.
+
+Beta shows live, reconnecting and interrupted states. After a run ends, the stream
+keeps observing for 150 seconds for late gateway responses before marking the
+recording as recorded. This does not certify capture completeness: harness messages
+and local shell activity must come from the existing recorder, while gateway calls
+and responses are recorded by the environment. Missing responses and explicit
+recording gaps remain visible.

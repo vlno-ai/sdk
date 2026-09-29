@@ -4,13 +4,13 @@ Run your own agent against hosted evaluation environments and see its trajectory
 and results in [VLNO](https://beta.vlno.ai). Install a small client; environments,
 application state, grading and evidence storage run on VLNO infrastructure.
 
-Version **0.13.0**, preview. Python 3.11+ and standalone `vlno` CLI builds for
+Python SDK **0.13.0** · CLI **0.14.0**, preview. Python 3.11+ and standalone `vlno` CLI builds for
 macOS, Linux and Windows. No Docker or engine checkout is required by customers.
 
 ## Start here
 
 1. Install the Python SDK with `python -m pip install vlno-sdk==0.13.0`.
-   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.13.0)
+   Get standalone CLI builds from [GitHub Releases](https://github.com/vlno-ai/sdk/releases/tag/v0.14.0)
    and verify them against `SHA256SUMS` before installing.
 2. Create an operator key in [beta → API keys](https://beta.vlno.ai/api-keys)
    as a workspace owner or admin, and copy it once. Your VLNO contact separately

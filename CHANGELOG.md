@@ -1,5 +1,13 @@
 # Changelog
 
+## CLI 0.14.0 — 2026-09-29
+
+- SSE for hosted run waits and world readiness; a readiness wait sends one case claim.
+- `platform runs watch` streams recorded trajectory and run status, with cursor replay after disconnects.
+- `--after` resumes a trajectory; `--json` emits newline-delimited event records.
+- Streaming validates frame sizes, identity and receipt order. Read reconnects never replay harness actions.
+- Python SDK remains at 0.13.0.
+
 ## Hosted service update — 2026-09-29
 
 - Add the workspace-assigned `issue-instruction-conflict@1` native Gitea pair.

@@ -9,8 +9,10 @@ import zipfile
 
 root=Path(__file__).resolve().parents[1]
 out=Path(sys.argv[1]).absolute();out.mkdir(parents=True,exist_ok=True)
-version='0.13.0'
-subprocess.run([sys.executable,'-c',"import setuptools.build_meta; setuptools.build_meta.build_wheel("+repr(str(out))+")"],cwd=root/'python',check=True)
+version='0.14.0'
+cli_only='--cli-only' in sys.argv[2:]
+if not cli_only:
+    subprocess.run([sys.executable,'-c',"import setuptools.build_meta; setuptools.build_meta.build_wheel("+repr(str(out))+")"],cwd=root/'python',check=True)
 for target,arch in [('darwin','arm64'),('darwin','amd64'),('linux','amd64'),('linux','arm64'),('windows','amd64')]:
     import tempfile
     with tempfile.TemporaryDirectory() as temporary:

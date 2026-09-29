@@ -1,4 +1,4 @@
-# VLNO 0.13.0: hosted evaluations and live trajectories
+# VLNO hosted clients: hosted evaluations and live trajectories
 
 This guide covers the runnable customer path. It supersedes earlier conceptual
 SDK examples: the released client is synchronous and uses organization-owned
@@ -10,7 +10,7 @@ unprovisioned organizations.
 
 Requirements: Python 3.11+ for the SDK, or the standalone CLI for your OS/CPU.
 Install the SDK from PyPI. CLI archives, a wheel for offline installation, source
-examples and `SHA256SUMS` are in the [0.13.0 release](https://github.com/vlno-ai/sdk/releases/tag/v0.13.0).
+examples and `SHA256SUMS` are in the [CLI 0.14.0 release](https://github.com/vlno-ai/sdk/releases/tag/v0.14.0). The Python SDK remains 0.13.0.
 
 ```sh
 python3 -m venv .venv
@@ -19,10 +19,10 @@ python -m pip install vlno-sdk==0.13.0
 python -c 'import vlno; print(vlno.__version__)'
 ```
 
-For the CLI, extract the matching `vlno_0.13.0_OS_ARCH` archive and put `vlno`
+For the CLI, extract the matching `vlno_0.14.0_OS_ARCH` archive and put `vlno`
 (or `vlno.exe`) on PATH. Check the downloaded file's SHA-256 against SHA256SUMS.
 On macOS/Linux use `shasum -a 256 FILE` or `sha256sum FILE`; Windows PowerShell
-has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.13.0.
+has `Get-FileHash FILE -Algorithm SHA256`. `vlno version --json` must show 0.14.0.
 
 Python source installation is also supported from this client-only repository:
 `python -m pip install ./python`. Building the CLI needs Go 1.23+:
@@ -338,3 +338,13 @@ stops account API access; existing scoped agent leases are separate. Cancel an
 active run to revoke its capability and clean up its world. Removing suite access
 blocks new runs and new task assignments, but does not retroactively stop a task
 already assigned. Use cancellation when that is required.
+
+Watch the run from another terminal while the harness works:
+
+```sh
+vlno platform runs watch "$RUN_ID" --wait-timeout 900s --json
+```
+
+This follows the recorded trajectory across cases. Connection loss resumes from the
+last complete event automatically; it does not restart the harness. Save a trajectory
+frame's `nextCursor` and pass `--after CURSOR` to resume in a new command.
