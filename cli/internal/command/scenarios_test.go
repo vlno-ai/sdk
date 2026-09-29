@@ -163,3 +163,20 @@ func TestGenerationCatalogsAndAuthenticationFailure(t *testing.T) {
 		t.Fatal(code, out, err)
 	}
 }
+
+func TestIntegrityFamilyIsAcceptedByOperatorCLI(t *testing.T) {
+	worker(t, func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["family"] != "archive-note-integrity" {
+			t.Error("wrong family")
+		}
+		io.WriteString(w, `{"id":"`+testID+`","state":"validated","cases":[]}`)
+	})
+	args := generationArgs()
+	args[3] = "archive-note-integrity"
+	code, out, err := invoke(t, args, "")
+	if code != 0 {
+		t.Fatal(code, out, err)
+	}
+}

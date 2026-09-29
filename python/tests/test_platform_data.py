@@ -49,3 +49,15 @@ class HostedDataTests(unittest.TestCase):
         self.call.return_value['nextOffset'] = 10
         with self.assertRaises(SDKError):
             self.client.data.deletions(limit=20, offset=20)
+
+
+class OperatorIntegrityFamilyTests(unittest.TestCase):
+    def test_operator_client_accepts_integrity_family_without_hosted_privilege_changes(self):
+        from closed_world_sdk import Client as WorkerClient
+        client = WorkerClient('https://worker.example.test', 'a' * 40)
+        client._transport.request = Mock(return_value={'id': 'a' * 32, 'state': 'validated'})
+        client.scenarios.generate('archive-note-integrity', 'notes-workspace@1', 29,
+                                  idempotency_key='integrity-test')
+        args = client._transport.request.call_args
+        self.assertEqual(args.args[2]['family'], 'archive-note-integrity')
+        self.assertEqual(args.kwargs['key'], 'integrity-test')

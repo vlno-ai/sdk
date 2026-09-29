@@ -62,7 +62,7 @@ func (r *runner) generateScenarios(args []string) error {
 	if fs.Parse(args) != nil || fs.NArg() != 0 {
 		return fail("usage")
 	}
-	if *family != "archive-note" && *family != "close-ticket" {
+	if *family != "archive-note" && *family != "archive-note-integrity" && *family != "close-ticket" {
 		return fail("invalid_family")
 	}
 	if !versionRef.MatchString(*template) {

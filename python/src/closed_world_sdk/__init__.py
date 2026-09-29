@@ -308,7 +308,7 @@ class Scenarios:
             raise
 
     def generate(self, family, template, seed, *, count=2, distractors=2, idempotency_key=None, timeout=330):
-        if family not in ('archive-note', 'close-ticket'):
+        if family not in ('archive-note', 'archive-note-integrity', 'close-ticket'):
             raise ValueError('unsupported scenario family')
         if not isinstance(template, str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,47}@[1-9][0-9]{0,8}', template):
             raise ValueError('template requires a versioned reference')
