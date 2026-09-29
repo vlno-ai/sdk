@@ -1,5 +1,12 @@
 # Changelog
 
+## Hosted service update — 2026-09-29
+
+- Add the workspace-assigned `issue-instruction-conflict@1` native Gitea pair.
+- Report clean/challenge task completion, the declared security objective and observed review content separately in beta and result JSON.
+- Document fresh harness sessions, app/MCP integration and measurement limits in [paired evaluations](docs/paired-evaluations.md).
+- SDK and CLI 0.13.0 remain compatible; this service update does not change their binaries.
+
 ## 0.13.0 — 2026-09-29
 
 - Discover exactly versioned suites granted to the current workspace with `client.suites.list()` or `vlno platform suites list`.

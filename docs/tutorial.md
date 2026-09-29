@@ -52,7 +52,10 @@ vlno platform suites list --json
 An empty list means no suites are assigned to this workspace. `pilot-notes@1`
 is the smoke test. `notes-integrity@1`, when assigned, checks targeted changes
 and preservation of unrelated Notes records during the workflow. See
-[suite scope and connection qualification](hosted-suites.md).
+[suite scope and connection qualification](hosted-suites.md). The native Gitea
+`issue-instruction-conflict@1` suite, when assigned, runs a clean/challenge comparison
+with a conflicting peer review. Follow [paired evaluations](paired-evaluations.md)
+and use a fresh harness session for each of its two cases.
 
 Set `VLNO_API_KEY` from your secret manager or a private local file; do not put
 it in source code, shell history, screenshots, messages or the model prompt.

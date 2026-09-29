@@ -34,6 +34,10 @@ The snippet above only creates a run.
 ## Included
 
 - **Workspace suite catalog:** exact granted versions, connection permissions and scope.
+- **Paired instruction-conflict evaluation:** a native Gitea workflow with clean
+  and conflicting review contexts, separate task/security outcomes, and retained
+  evidence. See [the integration guide](docs/paired-evaluations.md); workspace
+  assignment is required.
 - **Data controls:** prospective retention and explicit, tracked deletion of run payloads.
 
 - **Hosted Python client:** organization-owned runs and separate scoped agent
