@@ -72,7 +72,7 @@ func (r *runner) platform(args []string) error {
 		return r.productTranscript(action, id, args[3:])
 	}
 	switch action {
-	case "create", "status", "next", "finish", "wait", "cancel", "evidence", "artifact":
+	case "create", "status", "next", "finish", "wait", "watch", "cancel", "evidence", "artifact":
 	default:
 		return fail("usage")
 	}
@@ -83,7 +83,13 @@ func (r *runner) platform(args []string) error {
 	var body any
 	key, claimPath, outPath := "", "", ""
 	artifactIndex, kind := -1, ""
+	var after int64
 	switch action {
+	case "watch":
+		fs.Int64Var(&after, "after", 0, "")
+		if fs.Parse(args[3:]) != nil || fs.NArg() != 0 || after < 0 || after > 9007199254740991 {
+			return fail("usage")
+		}
 	case "artifact":
 		fs.IntVar(&artifactIndex, "case", -1, "")
 		fs.StringVar(&kind, "kind", "", "")
@@ -153,6 +159,9 @@ func (r *runner) platform(args []string) error {
 	if action == "evidence" || action == "artifact" {
 		return r.productEvidence(c, id, artifactIndex, kind, outPath)
 	}
+	if action == "watch" {
+		return r.productWatch(c, id, after)
+	}
 	if action == "next" {
 		return r.productNext(c, settings, id, claimPath, outPath)
 	}
@@ -180,6 +189,12 @@ func (r *runner) platform(args []string) error {
 		}
 		if !productRunID.MatchString(id) || !validProductRun(value, id) {
 			return runError(fail("invalid_response"), id, key)
+		}
+		if action == "wait" && !terminalRun(value) {
+			value, err = r.productWait(ctx, c, id)
+			if err != nil {
+				return runError(err, id, key)
+			}
 		}
 		if action != "wait" || terminalRun(value) {
 			if err = r.emit(value); err != nil {
@@ -306,7 +321,17 @@ func (r *runner) productNext(c *api.Client, settings config.Config, id, claimPat
 		if err != nil {
 			return runError(err, id, "")
 		}
+		if assignment["state"] == "creating" {
+			if err = r.productReady(ctx, c, id, assignment); err != nil {
+				return runError(err, id, "")
+			}
+			assignment["state"] = "ready"
+		}
 		if assignment["state"] == "ready" {
+			manifest, err = productConnection(assignment, run, settings)
+			if err != nil {
+				return runError(err, id, "")
+			}
 			if json.NewEncoder(f).Encode(manifest) != nil || f.Sync() != nil || f.Close() != nil {
 				return runError(fail("connection_file_unavailable"), id, "")
 			}

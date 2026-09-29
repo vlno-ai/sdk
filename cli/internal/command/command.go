@@ -22,7 +22,7 @@ import (
 	"github.com/vlno-ai/sdk/cli/internal/config"
 )
 
-const Version = "0.13.0"
+const Version = "0.14.0"
 const help = `vlno — remote world environments (preview)
 
 Usage:
@@ -39,6 +39,7 @@ Usage:
   vlno platform runs next <cw_run-id> --claim-file <private-file> --out <new-private-file>
   vlno platform runs finish <cw_run-id> --case <index> --claim-file <private-file> [--agent-status completed]
   vlno platform runs wait <cw_run-id>
+  vlno platform runs watch <cw_run-id> [--after <cursor>]
   vlno platform runs cancel <cw_run-id>
   vlno platform runs transcript <cw_run-id> --case <index> [--after <cursor>]
   vlno platform runs record <cw_run-id> --case <index> --claim-file <private-file>
@@ -126,6 +127,8 @@ Use a NEW claim file per case; reuse it only to recover that same assignment.
 Pass only the connection file to the harness, never the customer key or claim file.
 Platform record streams UTF-8 stdin to the live trajectory (native JSON is retained).
 Use the SDK process recorder to capture stdout and stderr separately.
+Platform next and wait use SSE and resume read-only streams after disconnects.
+Platform watch streams run status and recorded trajectory; --json emits JSON lines.
 Platform finish starts grading; wait exits 0 only for a passed, cleaned-up run.
 Create --environment opts into the isolated workstation exec endpoint and MCP tool.
 Exec returns a structured result; guest failure/truncation exits 1. Image upload is pending.

@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -69,6 +70,10 @@ func TestProductLifecycleUsesOwnerForControlAndScopedMCP(t *testing.T) {
 			} else {
 				json.NewEncoder(w).Encode(productView("running", "not_evaluated"))
 			}
+		case "/v1/world-runs/" + productID + "/events":
+			w.Header().Set("Content-Type", "text/event-stream")
+			data, _ := json.Marshal(map[string]any{"schema": "vlno.world-stream/1", "run": productView("running", "not_evaluated"), "readiness": []any{map[string]any{"caseIndex": 0, "worldId": testID, "state": "ready"}}})
+			fmt.Fprintf(w, "event: run\ndata: %s\n\n", data)
 		case "/v1/world-runs/" + productID + "/next":
 			var payload map[string]any
 			json.NewDecoder(r.Body).Decode(&payload)
@@ -105,8 +110,8 @@ func TestProductLifecycleUsesOwnerForControlAndScopedMCP(t *testing.T) {
 			t.Fatal(code, out, err)
 		}
 	}
-	if len(claims) != 2 || claims[0] != claims[1] {
-		t.Fatal("claim changed while waiting")
+	if len(claims) != 1 {
+		t.Fatal("readiness must not repeat case claims")
 	}
 	raw, e := os.ReadFile(path)
 	if e != nil {
