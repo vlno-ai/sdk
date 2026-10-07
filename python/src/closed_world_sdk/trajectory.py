@@ -80,7 +80,7 @@ class TrajectoryRecorder:
             self.emit('message', {'role': role, 'content': content[offset:offset+2048],
                                   'messageId': ident, 'part': part, 'last': offset+2048 >= len(content)})
 
-    def record_process(self, argv, *, input=None, env_keys=(), timeout=300):
+    def record_process(self, argv, *, input=None, env_keys=(), timeout=300, cwd=None):
         """Record a local harness's stdout/stderr live, including its native JSON.
 
         Enable that harness's normal transcript/stream output for conversation
@@ -91,6 +91,7 @@ class TrajectoryRecorder:
         if (not isinstance(argv, list) or not argv or not all(isinstance(v,str) and '\0' not in v for v in argv)
                 or isinstance(timeout,bool) or not isinstance(timeout,(int,float)) or not 0 < timeout <= 3600):
             raise ValueError('invalid command or timeout')
+        deadline=time.monotonic()+timeout
         env = {}
         for name in ('PATH','LANG','TMPDIR', *env_keys):
             if not isinstance(name,str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*',name):
@@ -107,8 +108,10 @@ class TrajectoryRecorder:
         payload = json.dumps(input if input is not None else {'task':self.case.task,'connection':self.case.agent.connection()}).encode()+b'\n'
         if len(payload)>4*1024*1024:
             raise ValueError('harness input too large')
+        if time.monotonic()>=deadline:
+            raise TimeoutError('harness process exceeded its deadline before launch')
         process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                   env=env, start_new_session=os.name=='posix')
+                                   env=env, cwd=cwd, start_new_session=os.name=='posix')
         stream = queue.Queue(maxsize=32)
         stop = threading.Event()
         def put(item):
@@ -143,8 +146,8 @@ class TrajectoryRecorder:
         for thread in threads: thread.start()
         pending={'stdout':'','stderr':''}
         finished=set()
-        deadline=time.monotonic()+timeout
         try:
+            self._process_started(process)
             while len(finished)<2:
                 if time.monotonic()>=deadline:
                     raise TimeoutError('harness process exceeded its deadline')
@@ -171,6 +174,7 @@ class TrajectoryRecorder:
                     self.emit(name, {'text':pending[name][:size]})
                     pending[name]=pending[name][size:]
             code=process.wait(timeout=max(.001,deadline-time.monotonic()))
+            self._process_exited(code)
             self.emit('lifecycle', {'event':'capture_finished','exitCode':code,'streams':['stdout','stderr']})
             return code
         except BaseException:
@@ -185,3 +189,9 @@ class TrajectoryRecorder:
             elif process.poll() is None: process.kill()
             process.wait(timeout=3)
             for thread in threads: thread.join(timeout=1)
+
+    def _process_started(self, process):
+        """Optional sink hook; failures remain inside owned-child cleanup."""
+
+    def _process_exited(self, code):
+        """Optional sink hook after both streams end and exit is observed."""

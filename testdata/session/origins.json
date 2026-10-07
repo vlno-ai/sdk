@@ -1,0 +1,38 @@
+{
+  "valid": [
+    {
+      "input": "https://EXAMPLE.test:443/",
+      "origin": "https://example.test"
+    },
+    {
+      "input": "http://[::1]:80",
+      "origin": "http://[::1]"
+    },
+    {
+      "input": "http://127.0.0.1:3121",
+      "origin": "http://127.0.0.1:3121"
+    },
+    {
+      "input": "https://example.test:00444",
+      "origin": "https://example.test:444"
+    }
+  ],
+  "invalid": [
+    "http://example.test",
+    "https://user:pass@example.test",
+    "https://bad host",
+    "https://-bad.test",
+    "https://good.-bad.test",
+    "https://example..test",
+    "https://example.test.",
+    "https://example.test:0",
+    "https://example.test:65536",
+    "https://example.test:",
+    "https://example.test?",
+    "https://example.test#",
+    "https://example.test/path",
+    "https://example.test\n",
+    "https://[example.test]",
+    "https://[::1%25zone]"
+  ]
+}

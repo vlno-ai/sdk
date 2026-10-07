@@ -27,6 +27,8 @@ func (r *runner) execute(args []string) error {
 	}
 	// Validate top-level routes before accessing config or the network.
 	switch args[0] {
+	case "sessions":
+		return r.sessions(args[1:])
 	case "platform":
 		return r.platform(args[1:])
 	case "login":

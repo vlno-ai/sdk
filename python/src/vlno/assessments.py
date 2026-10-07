@@ -11,6 +11,18 @@ class Assessments:
     def __init__(self, client):
         self._client = client
 
+    def session(self, path, *, assessment_id, plan_revision_id):
+        """Plan local durable work; no directory or run exists until connect/run_command."""
+        from .sessions.workflow import Session
+        identifier(UUID, assessment_id, "assessment ID")
+        identifier(UUID, plan_revision_id, "scope revision ID")
+        return Session(self, path, assessment_id=assessment_id, plan_revision_id=plan_revision_id)
+
+    def open_session(self, path):
+        """Lock and validate existing intent. Opening never sends or executes work."""
+        from .sessions.workflow import Session
+        return Session.open(self, path)
+
     def prepare(self, assessment_id, plan_revision_id):
         identifier(UUID, assessment_id, "assessment ID")
         identifier(UUID, plan_revision_id, "scope revision ID")
