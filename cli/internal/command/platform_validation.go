@@ -19,6 +19,9 @@ func validProductRun(v map[string]any, id string) bool {
 	if v["state"] == "provisioning" {
 		return v["result"] == nil
 	}
+	if v["result"] == nil && v["cancellationRequested"] == true && (v["state"] == "cancelled" || v["state"] == "failed") {
+		return true
+	}
 	if !validRun(v, id) {
 		return false
 	}

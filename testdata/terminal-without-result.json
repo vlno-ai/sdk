@@ -1,0 +1,12 @@
+[
+  {"state": "cancelled", "cancellationRequested": true, "valid": true},
+  {"state": "failed", "cancellationRequested": true, "valid": true},
+  {"state": "provisioning", "cancellationRequested": false, "valid": true},
+  {"state": "completed", "cancellationRequested": true, "valid": false},
+  {"state": "running", "cancellationRequested": true, "valid": false},
+  {"state": "cancelled", "cancellationRequested": false, "valid": false},
+  {"state": "failed", "cancellationRequested": false, "valid": false},
+  {"state": "cancelled", "cancellationRequested": "true", "valid": false},
+  {"state": "failed", "cancellationRequested": 1, "valid": false},
+  {"state": "cancelled", "valid": false}
+]

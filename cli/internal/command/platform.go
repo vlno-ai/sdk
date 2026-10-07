@@ -155,7 +155,7 @@ func (r *runner) platform(args []string) error {
 				return err
 			}
 			if action == "wait" {
-				result := value["result"].(map[string]any)
+				result, _ := value["result"].(map[string]any)
 				summary, _ := result["summary"].(map[string]any)
 				cleanup, _ := summary["cleanup"].(map[string]any)
 				if value["state"] != "completed" || result["evaluationStatus"] != "passed" || cleanup["status"] != "confirmed" {

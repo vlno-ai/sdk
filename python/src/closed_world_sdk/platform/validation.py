@@ -38,7 +38,7 @@ def _view(value, ident=None):
             if (not isinstance(case, dict) or type(case.get('index')) is not int or case['index'] != index
                     or case.get('state') not in _CASE_TERMINAL | {'pending', 'running', 'finishing'}):
                 raise SDKError('invalid_platform_response', run_id=value['id'])
-    elif value['state'] != 'provisioning':
+    elif not (value['state'] == 'provisioning' or
+              value['state'] in {'cancelled', 'failed'} and value.get('cancellationRequested') is True):
         raise SDKError('invalid_platform_response', run_id=value['id'])
     return value
-
