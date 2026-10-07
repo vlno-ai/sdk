@@ -1,0 +1,57 @@
+name: Client quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: client-quality-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Test customer contracts
+        run: python -m unittest discover -s python/tests
+        env:
+          PYTHONPATH: python/src:python/tests
+      - name: Install pinned wheel builder
+        run: python -m pip install --require-hashes -r python/build-requirements.txt
+      - name: Build client-only wheel
+        working-directory: python
+        run: python -c 'import setuptools.build_meta; setuptools.build_meta.build_wheel("../dist")'
+      - name: Verify a clean wheel install
+        run: |
+          python -m venv "$RUNNER_TEMP/vlno-wheel"
+          "$RUNNER_TEMP/vlno-wheel/bin/python" -m pip install --no-index dist/*.whl
+          "$RUNNER_TEMP/vlno-wheel/bin/python" -c 'from vlno import Client, PlatformRun, PlatformCase'
+
+  go:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          cache-dependency-path: cli/go.mod
+      - name: Test, vet and build CLI
+        working-directory: cli
+        run: |
+          go test ./...
+          go vet ./...
+          go build ./cmd/vlno
