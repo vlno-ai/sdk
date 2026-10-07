@@ -57,6 +57,9 @@ keys do not grant worker administration, app import or scenario authoring.
 
 ## Development
 
+The development branch adds [approved assessment runs](docs/approved-assessments.md).
+This candidate interface is not part of the published versions listed above.
+
 ```sh
 PYTHONPATH=python/src:python/tests python -m unittest discover -s python/tests
 (cd cli && go test ./...)

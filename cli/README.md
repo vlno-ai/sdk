@@ -19,6 +19,9 @@ A hosted customer key cannot administer the worker.
 
 Build: `go build -trimpath -o vlno ./cmd/vlno`. Test: `go test ./...`.
 
+Development only: [approved assessment commands](../docs/approved-assessments.md)
+are being qualified against the candidate API and are not in CLI 0.14.0.
+
 ## Hosted catalog and data
 
 `vlno platform suites list` shows the suites assigned to the authenticated workspace.

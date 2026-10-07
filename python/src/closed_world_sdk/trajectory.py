@@ -37,7 +37,7 @@ class TrajectoryRecorder:
         if isinstance(value, list):
             return [self._clean(v) for v in value]
         if isinstance(value, dict):
-            return {k: '[redacted]' if re.fullmatch(r'authorization|cookie|set-cookie|password|passwd|secret|api[-_]?key|access[-_]?token|refresh[-_]?token|token|claim', k, re.I) else self._clean(v) for k,v in value.items()}
+            return {self._clean(k): '[redacted]' if re.fullmatch(r'authorization|cookie|set-cookie|password|passwd|secret|api[-_]?key|access[-_]?token|refresh[-_]?token|token|claim', k, re.I) else self._clean(v) for k,v in value.items()}
         return value
 
     def emit(self, kind, data, *, event_id=None, occurred_at=None):
