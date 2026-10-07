@@ -22,7 +22,7 @@ class SinkStore:
         self.claim = CLAIM
         self._document['claim'].update(state='ready', actor=self._document['admission']['actor'],
             case={'index': 0, 'scenario': 'archive-note@1', 'worldId': 'b' * 32,
-                  'generation': 1, 'expiresAt': '2026-10-07T09:02:00.000Z'})
+                  'generation': 1, 'expiresAt': '2030-10-07T09:02:00.000Z'})
         self.files, self.failed = files, False
         self.calls, self.fail_at = 0, None
         if files:

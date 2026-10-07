@@ -26,7 +26,7 @@ def ready_store(path, command=None):
     store.update(lambda d: d['claim'].update(state='unknown', actor=d['admission']['actor']))
     store.update(lambda d: d['claim'].update(state='ready', case={
         'index': 0, 'scenario': 'archive-note@1', 'worldId': 'b' * 32,
-        'generation': 1, 'expiresAt': '2026-10-07T09:02:00.000Z'}))
+        'generation': 1, 'expiresAt': '2030-10-07T09:02:00.000Z'}))
     return store
 
 

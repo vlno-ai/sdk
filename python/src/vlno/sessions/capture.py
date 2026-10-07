@@ -1,9 +1,11 @@
 """Durable trajectory sink. Reopening/flushing never launches a process."""
 from datetime import datetime
 import math
+import time
 from closed_world_sdk import SDKError
 from closed_world_sdk.trajectory import TrajectoryRecorder
 from . import outbox
+from .uploads import flush_saved
 
 
 def matches_case(saved, case):
@@ -79,17 +81,7 @@ class DurableRecorder(TrajectoryRecorder):
 
     def flush(self):
         with self._lock:
-            while True:
-                capture = self.store.document['capture']
-                sequence = capture['acknowledgedThrough'] + 1
-                if sequence == capture['nextSequence']:
-                    return
-                value = capture['events'][sequence - 1]['event']
-                reply = self.run._request('POST', f'/cases/{self.case.index}/transcript',
-                                          {'claim': self._claim, 'events': [value]})
-                if type(reply) is not dict or reply.get('accepted') != [value['id']]:
-                    raise SDKError('invalid_transcript_acknowledgement', run_id=self.run.id)
-                outbox.acknowledge(self.store, sequence, value['id'])
+            flush_saved(self.store, self.run, self.case.index)
 
     def recover(self):
         """An interrupted open capture cannot be repaired by an empty outbox."""
@@ -112,6 +104,9 @@ class DurableRecorder(TrajectoryRecorder):
                 raise SDKError('session_command_changed')
             self._capturing = True
             try:
+                timeout = min(timeout, self.case.expires_at - time.time())
+                if timeout <= 0:
+                    raise SDKError('session_connection_expired')
                 return super().record_process(argv, input=input, env_keys=env_keys, timeout=timeout, cwd=cwd)
             except BaseException:
                 self._gap()

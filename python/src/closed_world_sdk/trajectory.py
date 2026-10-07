@@ -91,6 +91,7 @@ class TrajectoryRecorder:
         if (not isinstance(argv, list) or not argv or not all(isinstance(v,str) and '\0' not in v for v in argv)
                 or isinstance(timeout,bool) or not isinstance(timeout,(int,float)) or not 0 < timeout <= 3600):
             raise ValueError('invalid command or timeout')
+        deadline=time.monotonic()+timeout
         env = {}
         for name in ('PATH','LANG','TMPDIR', *env_keys):
             if not isinstance(name,str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*',name):
@@ -107,6 +108,8 @@ class TrajectoryRecorder:
         payload = json.dumps(input if input is not None else {'task':self.case.task,'connection':self.case.agent.connection()}).encode()+b'\n'
         if len(payload)>4*1024*1024:
             raise ValueError('harness input too large')
+        if time.monotonic()>=deadline:
+            raise TimeoutError('harness process exceeded its deadline before launch')
         process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                    env=env, cwd=cwd, start_new_session=os.name=='posix')
         stream = queue.Queue(maxsize=32)
@@ -143,7 +146,6 @@ class TrajectoryRecorder:
         for thread in threads: thread.start()
         pending={'stdout':'','stderr':''}
         finished=set()
-        deadline=time.monotonic()+timeout
         try:
             self._process_started(process)
             while len(finished)<2:
