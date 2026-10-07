@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/vlno-ai/sdk/cli/internal/harness"
 	"io"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
-	"time"
 )
 
 type agentConfig struct {
@@ -95,74 +94,17 @@ func loadAgentConfig(path string) (agentConfig, error) {
 	}
 	return cfg, nil
 }
-func deniedEnv(name string) bool {
-	name = strings.ToUpper(name)
-	return strings.HasPrefix(name, "VLNO_") || strings.HasPrefix(name, "CLOSED_WORLD_") || strings.HasPrefix(name, "WORKER_") || strings.HasPrefix(name, "CW_") || strings.Contains(name, "CLAIM")
-}
+func deniedEnv(name string) bool { return harness.DeniedEnvironment(name) }
 func agentEnv(cfg agentConfig, privateValues ...string) []string {
-	keys := append([]string{"PATH", "LANG", "TMPDIR"}, cfg.EnvKeys...)
-	seen := map[string]bool{}
-	result := []string{}
-	for _, key := range keys {
-		if seen[key] || deniedEnv(key) {
-			continue
-		}
-		seen[key] = true
-		value, ok := os.LookupEnv(key)
-		if !ok {
-			continue
-		}
-		private := false
-		for _, secret := range privateValues {
-			if secret != "" && strings.Contains(value, secret) {
-				private = true
-				break
-			}
-		}
-		if !private {
-			result = append(result, key+"="+value)
-		}
-	}
-	return result
+	return harness.Environment(cfg.EnvKeys, privateValues...)
 }
 
-// No child output is retained: arbitrary output may contain credentials. Discard
-// provides constant memory even for an unbounded producer, while the deadline
-// bounds its execution. Exit zero is only an execution result, never a grade.
+// Legacy suite execution deliberately discards output; durable sessions use the
+// same process ownership primitive with an explicit bounded capture sink.
 func executeAgent(ctx context.Context, cfg agentConfig, input map[string]any, env []string) string {
 	data, err := json.Marshal(input)
-	if err != nil || len(data) > 4*1024*1024 {
+	if err != nil {
 		return "error"
 	}
-	cmd := exec.Command(cfg.Argv[0], cfg.Argv[1:]...)
-	cmd.WaitDelay = time.Second
-	cmd.Env = env
-	cmd.Stdin = bytes.NewReader(append(data, '\n'))
-	cmd.Stdout = io.Discard
-	cmd.Stderr = io.Discard
-	prepareAgent(cmd)
-	if cmd.Start() != nil {
-		return "error"
-	}
-	done := make(chan error, 1)
-	go func() { done <- cmd.Wait() }()
-	select {
-	case err = <-done:
-		// Remove background descendants left by an otherwise completed agent.
-		killAgent(cmd)
-		if ctx.Err() != nil {
-			return "timeout"
-		}
-		if err != nil {
-			return "error"
-		}
-		return "completed"
-	case <-ctx.Done():
-		killAgent(cmd)
-		select {
-		case <-done:
-		case <-time.After(2 * time.Second):
-		}
-		return "timeout"
-	}
+	return harness.Run(ctx, harness.Spec{Argv: cfg.Argv, Env: env, Input: data, Stdout: io.Discard, Stderr: io.Discard}, nil).Status
 }

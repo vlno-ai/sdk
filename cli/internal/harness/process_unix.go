@@ -1,14 +1,14 @@
 //go:build !windows
 
-package command
+package harness
 
 import (
 	"os/exec"
 	"syscall"
 )
 
-func prepareAgent(cmd *exec.Cmd) { cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} }
-func killAgent(cmd *exec.Cmd) {
+func prepare(cmd *exec.Cmd) { cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} }
+func kill(cmd *exec.Cmd) {
 	if cmd.Process != nil {
 		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	}

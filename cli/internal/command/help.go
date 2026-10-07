@@ -5,6 +5,10 @@ const Version = "0.14.0"
 const help = `vlno — remote world environments (preview)
 
 Usage:
+  vlno sessions start <private-dir> --assessment <id> --revision <id> [--env KEY] [--cwd path] [--agent-timeout seconds] -- <program> [args...]
+  vlno sessions resume <private-dir>
+  vlno sessions status <private-dir>
+  vlno sessions cancel <private-dir>
   vlno login --key-stdin
   vlno platform login --key-stdin
   vlno platform assessments prepare <assessment-id> --revision <scope-revision-id>
