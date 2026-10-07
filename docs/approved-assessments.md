@@ -38,6 +38,10 @@ run_id = receipt["runId"]
 ```
 
 The receipt is immutable. It identifies the reserved run, not its current status.
+The one-attempt limit applies to each admitted run. While approval remains valid,
+separate explicit requests can reserve additional runs; there is no lifetime
+attempt quota or aggregate model-spending cap in this profile.
+
 The environment and agent have not started. Connect before `claimBefore`;
 the reservation window is at most ten minutes and can be shorter.
 
