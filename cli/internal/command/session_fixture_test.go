@@ -15,6 +15,8 @@ type sessionAPI struct {
 	posts, finishes, nexts    int
 	loseAdmission, loseFinish bool
 	loseOutput                bool
+	loseCancel                bool
+	cancellations             int
 	events                    []map[string]any
 }
 
@@ -40,6 +42,10 @@ func sessionServer(t *testing.T) *sessionAPI {
 		}
 		if r.Method == "POST" {
 			f.posts++
+			if r.Header.Get("Content-Type") != "application/json" {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 		}
 		switch {
 		case strings.HasSuffix(r.URL.Path, "/access"):
@@ -131,7 +137,18 @@ func sessionServer(t *testing.T) *sessionAPI {
 			reply["id"] = f.receipt["runId"]
 			json.NewEncoder(w).Encode(reply)
 		case strings.HasSuffix(r.URL.Path, "/cancel"):
+			body, e := decodeObject(r.Body)
+			if e != nil || len(body) != 0 {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			f.cancellations++
 			f.status["phase"] = "cancelled"
+			if f.loseCancel {
+				f.loseCancel = false
+				dropReply(w)
+				return
+			}
 			reply := productView("cancelled", "not_evaluated")
 			reply["id"] = f.receipt["runId"]
 			reply["cancellationRequested"] = true
@@ -143,42 +160,4 @@ func sessionServer(t *testing.T) *sessionAPI {
 	})
 	t.Setenv("VLNO_API_KEY", productKey)
 	return f
-}
-
-type sessionCounts struct {
-	posts, nexts, finishes int
-	claim                  string
-	events                 []map[string]any
-}
-
-func (f *sessionAPI) snapshot() sessionCounts {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	return sessionCounts{
-		posts:    f.posts,
-		nexts:    f.nexts,
-		finishes: f.finishes,
-
-		claim:  f.claim,
-		events: append([]map[string]any{}, f.events...),
-	}
-}
-func dropReply(w http.ResponseWriter) {
-	conn, _, e := w.(http.Hijacker).Hijack()
-	if e == nil {
-		conn.Close()
-	}
-}
-
-func (f *sessionAPI) loseReply(kind string) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	switch kind {
-	case "finish":
-		f.loseFinish = true
-	case "admission":
-		f.loseAdmission = true
-	case "output":
-		f.loseOutput = true
-	}
 }

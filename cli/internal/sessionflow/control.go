@@ -34,7 +34,7 @@ func (p *Protocol) Cancel(ctx context.Context, allowNew bool) error {
 			return e
 		}
 	}
-	reply, e := p.Client.Request(ctx, "POST", "/v1/world-runs/"+runID(j)+"/cancel", nil, "")
+	reply, e := p.Client.Request(ctx, "POST", "/v1/world-runs/"+runID(j)+"/cancel", map[string]any{}, "")
 	if e != nil {
 		return p.dispatchError(e, "cancel_unknown")
 	}
