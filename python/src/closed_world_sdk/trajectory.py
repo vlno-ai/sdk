@@ -80,7 +80,7 @@ class TrajectoryRecorder:
             self.emit('message', {'role': role, 'content': content[offset:offset+2048],
                                   'messageId': ident, 'part': part, 'last': offset+2048 >= len(content)})
 
-    def record_process(self, argv, *, input=None, env_keys=(), timeout=300):
+    def record_process(self, argv, *, input=None, env_keys=(), timeout=300, cwd=None):
         """Record a local harness's stdout/stderr live, including its native JSON.
 
         Enable that harness's normal transcript/stream output for conversation
@@ -108,7 +108,7 @@ class TrajectoryRecorder:
         if len(payload)>4*1024*1024:
             raise ValueError('harness input too large')
         process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                   env=env, start_new_session=os.name=='posix')
+                                   env=env, cwd=cwd, start_new_session=os.name=='posix')
         stream = queue.Queue(maxsize=32)
         stop = threading.Event()
         def put(item):
@@ -145,6 +145,7 @@ class TrajectoryRecorder:
         finished=set()
         deadline=time.monotonic()+timeout
         try:
+            self._process_started(process)
             while len(finished)<2:
                 if time.monotonic()>=deadline:
                     raise TimeoutError('harness process exceeded its deadline')
@@ -171,6 +172,7 @@ class TrajectoryRecorder:
                     self.emit(name, {'text':pending[name][:size]})
                     pending[name]=pending[name][size:]
             code=process.wait(timeout=max(.001,deadline-time.monotonic()))
+            self._process_exited(code)
             self.emit('lifecycle', {'event':'capture_finished','exitCode':code,'streams':['stdout','stderr']})
             return code
         except BaseException:
@@ -185,3 +187,9 @@ class TrajectoryRecorder:
             elif process.poll() is None: process.kill()
             process.wait(timeout=3)
             for thread in threads: thread.join(timeout=1)
+
+    def _process_started(self, process):
+        """Optional sink hook; failures remain inside owned-child cleanup."""
+
+    def _process_exited(self, code):
+        """Optional sink hook after both streams end and exit is observed."""
