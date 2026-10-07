@@ -65,7 +65,10 @@ class DurableRecorder(TrajectoryRecorder):
                 raise SDKError('session_capture_incomplete')
             if kind == 'gap':
                 identity = outbox.gap(self.store)
-                self.flush()
+                # Process error cleanup must not retry an uncertain upload.
+                # Preserve the gap locally for an explicit recovery operation.
+                if not self._capturing:
+                    self.flush()
                 return identity
             try:
                 value = outbox.event(kind, self._clean(data), event_id, occurred_at)
