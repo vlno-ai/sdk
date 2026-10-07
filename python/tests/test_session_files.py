@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from vlno.session_files import PrivateDirectory, SessionFileError
+from vlno.sessions.files import PrivateDirectory, SessionFileError
 
 
 @unittest.skipUnless(sys.platform in {"darwin", "linux"}, "local POSIX sessions")
@@ -23,7 +23,7 @@ class SessionFilesTests(unittest.TestCase):
     def test_exclusive_ownership_survives_another_process_open(self):
         script = """
 import sys
-from vlno.session_files import PrivateDirectory, SessionFileError
+from vlno.sessions.files import PrivateDirectory, SessionFileError
 try:
     PrivateDirectory(sys.argv[1])
 except SessionFileError as error:
@@ -50,7 +50,7 @@ raise AssertionError('second owner acquired lock')
 
     def test_failed_file_sync_keeps_previous_bytes(self):
         self.files.write_new("journal.json", b"old")
-        with patch("vlno.session_files.os.fsync", side_effect=OSError("disk failure")):
+        with patch("vlno.sessions.files.os.fsync", side_effect=OSError("disk failure")):
             with self.assertRaises(OSError):
                 self.files.replace("journal.json", b"new")
         self.assertEqual(self.files.read("journal.json", 10), b"old")
@@ -65,7 +65,7 @@ raise AssertionError('second owner acquired lock')
                 raise OSError("directory sync failed")
             actual_sync(descriptor)
 
-        with patch("vlno.session_files.os.fsync", side_effect=fail_directory):
+        with patch("vlno.sessions.files.os.fsync", side_effect=fail_directory):
             with self.assertRaises(OSError):
                 self.files.replace("journal.json", b"new")
         # Rename may have succeeded; callers must reload and retain uncertainty.

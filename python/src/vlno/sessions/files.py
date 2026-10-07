@@ -11,6 +11,8 @@ import secrets
 import stat
 import sys
 
+from .filesystems import supported_filesystem
+
 
 class SessionFileError(RuntimeError):
     """A stable diagnostic; never include session contents in the message."""
@@ -42,6 +44,8 @@ class PrivateDirectory:
                 finally:
                     os.close(parent)
             self.fd = os.open(self.path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            if not supported_filesystem(self.fd):
+                raise SessionFileError("session_filesystem_unsupported")
             info = os.fstat(self.fd)
             if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o700:
                 raise SessionFileError("session_directory_not_private")
@@ -59,7 +63,7 @@ class PrivateDirectory:
     def _open(self, name, flags):
         if not isinstance(name, str) or not re.fullmatch(r"[a-z.][a-z0-9.-]{0,63}", name) or name in {".", ".."}:
             raise SessionFileError("session_filename_invalid")
-        return os.open(name, flags | os.O_NOFOLLOW | os.O_CLOEXEC,
+        return os.open(name, flags | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK,
                        0o600, dir_fd=self.fd)
 
     def check(self):
