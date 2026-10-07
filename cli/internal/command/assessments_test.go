@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"os"
 	"reflect"
@@ -36,6 +37,10 @@ func TestAssessmentReadinessAndStatusDoNotExecute(t *testing.T) {
 	paths := []string{}
 	worker(t, func(w http.ResponseWriter, r *http.Request) {
 		paths = append(paths, r.Method+" "+r.URL.Path)
+		body, err := io.ReadAll(r.Body)
+		if err != nil || len(body) != 0 {
+			t.Fatal("assessment reads must not send a JSON null body")
+		}
 		if r.Method != "GET" || r.Header.Get("Authorization") != "Bearer "+productKey {
 			t.Error("invalid read")
 		}

@@ -51,13 +51,15 @@ func (r *runner) assessments(args []string) error {
 		return err
 	}
 	path, method := "/v1/assessments/"+id+"/revisions/"+revision+"/run-preparation", "GET"
-	var body map[string]any
+	var body any
+	var command map[string]any
 	if action == "status" {
 		path = "/v1/world-runs/" + id + "/assessment-run"
 	}
 	if action == "admit" {
 		path, method = "/v1/assessments/"+id+"/runs", "POST"
-		body = map[string]any{"planRevisionId": revision, "approvalReviewId": approval, "systemRevisionId": system}
+		command = map[string]any{"planRevisionId": revision, "approvalReviewId": approval, "systemRevisionId": system}
+		body = command
 	}
 	value, err := c.Request(r.ctx, method, path, body, key)
 	if err != nil {
@@ -68,7 +70,7 @@ func (r *runner) assessments(args []string) error {
 	case "prepare":
 		valid = assessment.Preparation(value, id, revision)
 	case "admit":
-		valid = assessment.Admission(value, id, body, key)
+		valid = assessment.Admission(value, id, command, key)
 	case "status":
 		valid = assessment.Status(value, id)
 	}
