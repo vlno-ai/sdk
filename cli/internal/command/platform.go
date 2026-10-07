@@ -6,6 +6,9 @@ import (
 )
 
 func (r *runner) platform(args []string) error {
+	if len(args) > 0 && args[0] == "assessments" {
+		return r.assessments(args[1:])
+	}
 	if len(args) > 0 && args[0] == "data" {
 		return r.productData(args[1:])
 	}

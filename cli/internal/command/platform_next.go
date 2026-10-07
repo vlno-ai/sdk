@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/vlno-ai/sdk/cli/internal/api"
 	"github.com/vlno-ai/sdk/cli/internal/config"
 	"os"
@@ -40,6 +41,13 @@ func (r *runner) productNext(c *api.Client, settings config.Config, id, claimPat
 	for {
 		value, err := c.Request(ctx, "POST", path+"/next", map[string]any{"claim": claim}, "")
 		if err != nil {
+			var remote *api.Error
+			if errors.As(err, &remote) && remote.Status == 503 && remote.Code == "run_preparing" && remote.Outcome != "unknown" {
+				if err = productPause(ctx); err != nil {
+					return runError(err, id, "")
+				}
+				continue
+			}
 			return runError(err, id, "")
 		}
 		run, ok := value["run"].(map[string]any)

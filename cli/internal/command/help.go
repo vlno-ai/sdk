@@ -7,6 +7,9 @@ const help = `vlno — remote world environments (preview)
 Usage:
   vlno login --key-stdin
   vlno platform login --key-stdin
+  vlno platform assessments prepare <assessment-id> --revision <scope-revision-id>
+  vlno platform assessments admit <assessment-id> --revision <scope-revision-id> --approval <review-id> --system-revision <system-revision-id> --idempotency-key <saved-key>
+  vlno platform assessments status <cw_run-id>
   vlno platform data policy
   vlno platform data set-policy --days <7|30|90|keep> --revision <current-revision>
   vlno platform data status <cw_run-id>
